@@ -23,3 +23,7 @@ spmc = "0.2"
 [[bin]]
 name = "http_client"
 path = "src/bin/client.rs"
+
+[[bin]]
+name = "http_server"
+path = "src/bin/server.rs"
