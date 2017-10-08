@@ -4,6 +4,8 @@ extern crate futures;
 extern crate hyper;
 extern crate pretty_env_logger;
 
+use std::env;
+
 use futures::future::FutureResult;
 
 use hyper::{Get, Post, StatusCode};
@@ -46,7 +48,17 @@ impl Service for Echo {
 
 fn main() {
     pretty_env_logger::init().unwrap();
-    let addr = "127.0.0.1:8080".parse().unwrap();
+
+    let n_args = env::args().len();
+    if n_args != 3 {
+        println!("Usage: {} <host> <port>", env::args().nth(0).unwrap());
+        return;
+    }
+    // form the address
+    let mut host_addr = env::args().nth(1).unwrap();
+    host_addr.push_str(":");
+    host_addr.push_str(&env::args().nth(2).unwrap());
+    let addr = host_addr.parse().unwrap();
 
     let server = Http::new().bind(&addr, || Ok(Echo)).unwrap();
     println!("Listening on http://{} with 1 thread", server.local_addr().unwrap());
