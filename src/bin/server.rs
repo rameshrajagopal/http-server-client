@@ -3,6 +3,7 @@
 extern crate futures;
 extern crate hyper;
 extern crate pretty_env_logger;
+extern crate url;
 
 use std::env;
 
@@ -12,7 +13,17 @@ use hyper::{Get, Post, StatusCode};
 use hyper::header::ContentLength;
 use hyper::server::{Http, Service, Request, Response};
 
-static INDEX: &'static [u8] = b"Try POST /echo";
+#[macro_use]
+extern crate serde_derive;
+
+extern crate serde;
+extern crate serde_json;
+
+#[derive(Serialize, Deserialize, Debug)]
+struct AppResponse {
+    count: i32,
+    result: String,
+}
 
 struct Echo;
 
@@ -24,11 +35,19 @@ impl Service for Echo {
 
     fn call(&self, req: Request) -> Self::Future {
         futures::future::ok(match (req.method(), req.path()) {
-            (&Get, "/") | (&Get, "/echo") => {
+            (&Get, "/") => {
+                let res = "Hi you are index page".to_owned();
                 Response::new()
-                    .with_header(ContentLength(INDEX.len() as u64))
-                    .with_body(INDEX)
+                    .with_header(ContentLength(res.len() as u64))
+                    .with_body(res)
             },
+            (&Get, "/echo") => {
+                let res = AppResponse { count: 10, result: "success".to_owned() };
+                let res_str = serde_json::to_string(&res).unwrap();
+                Response::new()
+                    .with_header(ContentLength(res_str.len() as u64))
+                    .with_body(res_str)
+            }
             (&Post, "/echo") => {
                 println!("Received post request");
                 let mut res = Response::new();
