@@ -47,7 +47,7 @@ impl Service for Echo {
                 Response::new()
                     .with_header(ContentLength(res_str.len() as u64))
                     .with_body(res_str)
-            }
+            },
             (&Post, "/echo") => {
                 println!("Received post request");
                 let mut res = Response::new();
