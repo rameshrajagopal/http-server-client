@@ -41,7 +41,7 @@ impl Service for Echo {
                     .with_header(ContentLength(res.len() as u64))
                     .with_body(res)
             },
-            (&Get, "/echo") => {
+            (&Get, "/products") => {
                 let res = AppResponse { count: 10, result: "success".to_owned() };
                 let res_str = serde_json::to_string(&res).unwrap();
                 Response::new()
